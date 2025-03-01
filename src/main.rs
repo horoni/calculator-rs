@@ -11,6 +11,13 @@ fn get_precedence(op: &str) -> isize {
     }
 }
 
+fn is_binary(op: &str) -> bool {
+    match op {
+        "+" | "-" | "*" | "/" | "^" => true,
+        _ => false,
+    }
+}
+
 fn is_postfix(op: &str) -> bool {
     match op {
         "!" => true,
@@ -30,11 +37,19 @@ fn rpn_from_infix(exp: String) -> Vec<String> {
     let mut stack: Vec<String> = Vec::new();
     let mut num = String::new();
     let mut op = String::new();
+    let mut last_op = String::from("Null");
 
     for c in exp.chars() {
         if c.is_whitespace() {
             continue;
         }
+        if c == '-' {
+            if last_op == "Null" || last_op == "(" || is_binary(last_op.as_str()) {
+                num.push(c);
+                continue;
+            }
+        }
+        last_op = c.to_string();
         if c.is_digit(10) || c == '.' {
             num.push(c);
             continue;
@@ -137,12 +152,6 @@ fn rpn_evaluate(exp: Vec<String>) -> Result<f64, String> {
     stack.pop().ok_or("Evaluate error".to_string())
 }
 
-fn rpn_from_infix_proxy(exp: String) -> Vec<String> {
-    let out = rpn_from_infix(exp);
-    println!("{:#?}", out);
-    out
-}
-
 fn read_input(prompt: &str) -> io::Result<String> {
     let mut out = String::new();
     print!("{}", prompt);
@@ -156,7 +165,7 @@ fn main() -> io::Result<()> {
         let exp: String = read_input(">>> ")?;
         match exp.trim() {
             "exit" | "q" => break,
-            _ => match rpn_evaluate(rpn_from_infix_proxy(exp)) {
+            _ => match rpn_evaluate(rpn_from_infix(exp)) {
                 Ok(result) => println!("<<< {:?}", result),
                 Err(e) => println!("<<< {}", e),
             },
