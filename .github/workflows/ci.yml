@@ -1,5 +1,13 @@
 name: CI
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches: '*'
+    tags-ignore: '*'
+    paths:
+      - 'Cargo.toml'
+      - 'src/**'
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -18,14 +26,14 @@ jobs:
         with:
           components: rustfmt
       - run: cargo fmt --check
-  build-release:
-    name: Build debug
+  check:
+    name: cargo check    
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo build
-  build-debug:
+      - run: cargo check
+  build-release:
     name: Build release
     runs-on: ubuntu-latest
     steps:
