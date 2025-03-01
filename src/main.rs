@@ -185,26 +185,10 @@ mod tests {
         let r_mul = String::from("3*5");
         let r_div = String::from("21/7");
 
-        assert_eq!(
-            rpn_evaluate(rpn_from_infix(r_add)).unwrap(),
-            9.0,
-            "Add failed"
-        );
-        assert_eq!(
-            rpn_evaluate(rpn_from_infix(r_sub)).unwrap(),
-            -2.0,
-            "Sub failed"
-        );
-        assert_eq!(
-            rpn_evaluate(rpn_from_infix(r_mul)).unwrap(),
-            15.0,
-            "Mul failed"
-        );
-        assert_eq!(
-            rpn_evaluate(rpn_from_infix(r_div)).unwrap(),
-            3.0,
-            "Div failed"
-        );
+        assert_eq!(rpn_evaluate(rpn_from_infix(r_add)).unwrap(), 9.0, "Add failed");
+        assert_eq!(rpn_evaluate(rpn_from_infix(r_sub)).unwrap(), -2.0, "Sub failed");
+        assert_eq!(rpn_evaluate(rpn_from_infix(r_mul)).unwrap(), 15.0, "Mul failed");
+        assert_eq!(rpn_evaluate(rpn_from_infix(r_div)).unwrap(), 3.0, "Div failed");
     }
 
     #[test]
@@ -254,5 +238,16 @@ mod tests {
 
         assert_eq!(rpn_evaluate(r_1).unwrap(), 1.0, "sin failed");
         assert_eq!(rpn_evaluate(r_2).unwrap(), -1.0, "cos failed");
+    }
+
+    #[test]
+    fn negative() {
+        let r_1 = rpn_from_infix(String::from("-1+1"));
+        let r_2 = rpn_from_infix(String::from("10^-2"));
+        let r_3 = rpn_from_infix(String::from("15 * (-4)"));
+
+        assert_eq!(rpn_evaluate(r_1).unwrap(), 0.0, "Start of expression");
+        assert_eq!(rpn_evaluate(r_2).unwrap(), 0.01, "After binary operator");
+        assert_eq!(rpn_evaluate(r_3).unwrap(), -60.0, "After opening parenthese");
     }
 }
