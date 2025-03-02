@@ -190,6 +190,10 @@ fn read_input(prompt: &str) -> io::Result<String> {
 }
 
 fn main() -> io::Result<()> {
+    println!(
+        "Interactive calculator {} by horoni @ github.com",
+        env!("CARGO_PKG_VERSION")
+    );
     loop {
         let exp: String = read_input(">>> ")?;
         match exp.trim() {
@@ -200,6 +204,7 @@ fn main() -> io::Result<()> {
             },
         }
     }
+    println!("Goodbye!");
     Ok(())
 }
 
