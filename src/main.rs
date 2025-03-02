@@ -121,6 +121,18 @@ fn factorial(n: usize) -> Option<usize> {
     Some(n * factorial(n - 1).unwrap())
 }
 
+fn round_close(value: f64) -> f64 {
+    if (value - value.round()).abs() < 1e-5 {
+        value.round()
+    } else {
+        value
+    }
+}
+
+fn arccot(angle: f64) -> f64 {
+    (angle / (1.0 + angle.powf(2.0)).sqrt()).acos()
+}
+
 fn rpn_evaluate(exp: Vec<String>) -> Result<f64, String> {
     let mut stack = Vec::new();
 
@@ -141,18 +153,18 @@ fn rpn_evaluate(exp: Vec<String>) -> Result<f64, String> {
                 "/" => stack.push(l / r),
                 "^" => stack.push(l.powf(r)),
                 "sqrt" => stack.push(l.sqrt()),
-                "sin" => stack.push(l.to_radians().sin()),
-                "cos" => stack.push(l.to_radians().cos()),
-                "tan" => stack.push(l.to_radians().tan()),
-                "cot" => stack.push(l.to_radians().cos() / l.to_radians().sin()),
-                "sec" => stack.push(1.0 / l.to_radians().cos()),
-                "csc" => stack.push(1.0 / l.to_radians().sin()),
-                "arcsin" => stack.push(l.asin().to_degrees()),
-                "arccos" => stack.push(l.acos().to_degrees()),
-                "arctan" => stack.push(l.atan()),
-                "arccot" => stack.push((l / (1.0 + l.powf(2.0)).sqrt()).acos()),
-                "arcsec" => stack.push((1.0 / l).acos().to_degrees()),
-                "arccsc" => stack.push((1.0 / l).asin().to_degrees()),
+                "sin" => stack.push(round_close(l.to_radians().sin())),
+                "cos" => stack.push(round_close(l.to_radians().cos())),
+                "tan" => stack.push(round_close(l.to_radians().tan())),
+                "cot" => stack.push(round_close(l.to_radians().cos() / l.to_radians().sin())),
+                "sec" => stack.push(round_close(1.0 / l.to_radians().cos())),
+                "csc" => stack.push(round_close(1.0 / l.to_radians().sin())),
+                "arcsin" => stack.push(round_close(l.asin().to_degrees())),
+                "arccos" => stack.push(round_close(l.acos().to_degrees())),
+                "arctan" => stack.push(round_close(l.atan().to_degrees())),
+                "arccot" => stack.push(round_close(arccot(l).to_degrees())),
+                "arcsec" => stack.push(round_close((1.0 / l).acos().to_degrees())),
+                "arccsc" => stack.push(round_close((1.0 / l).asin().to_degrees())),
                 "!" => stack.push(factorial(l.round() as usize).ok_or("factorial error")? as f64),
                 _ => return Err(format!("Unknown operator {}", tok)),
             }
