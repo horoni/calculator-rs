@@ -46,7 +46,7 @@ jobs:
       - name: Build
         run: cargo build --release --locked --target ${{ matrix.target }}
       - name: Get binaries path
-        run: export BINARIES=$(cargo build -q --message-format=json-render-diagnostics --release --locked --target ${{ matrix.target }} | jq -r 'select(.reason == "compiler-artifact") | select(.executable != null) | .executable')
+        run: echo "BINARIES=$(cargo build -q --message-format=json-render-diagnostics --release --locked --target ${{ matrix.target }} | jq -r 'select(.reason == "compiler-artifact") | select(.executable != null) | .executable' | tr '\n' ' ')" >> "$GITHUB_ENV"
       - name: Create archive for Linux
         if: ${{ contains(matrix.target, 'linux') }}
         run: bins=($BINARIES); tar -czf ${{ matrix.name }} -C $(dirname ${bins[0]}) $(for bin in ${bins[@]}; do basename $bin; done)
