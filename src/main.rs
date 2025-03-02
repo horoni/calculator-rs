@@ -3,7 +3,8 @@ use std::io::{self, Write};
 fn get_precedence(op: &str) -> isize {
     match op {
         "!" => 5,
-        "sqrt" | "sin" | "cos" => 4,
+        "sqrt" | "sin" | "cos" | "tan" | "cot" | "sec" | "csc" | "arcsin" | "arccos" | "arctan"
+        | "arccot" | "arcsec" | "arccsc" => 4,
         "^" => 3,
         "*" | "/" => 2,
         "+" | "-" => 1,
@@ -27,7 +28,8 @@ fn is_postfix(op: &str) -> bool {
 
 fn is_prefix(op: &str) -> bool {
     match op {
-        "sqrt" | "sin" | "cos" => true,
+        "sqrt" | "sin" | "cos" | "tan" | "cot" | "sec" | "csc" | "arcsin" | "arccos" | "arctan"
+        | "arccot" | "arcsec" | "arccsc" => true,
         _ => false,
     }
 }
@@ -44,7 +46,11 @@ fn rpn_from_infix(exp: String) -> Vec<String> {
             continue;
         }
         if c == '-' {
-            if last_op == "Null" || last_op == "(" || is_binary(last_op.as_str()) {
+            if last_op == "Null"
+                || last_op == "("
+                || is_binary(last_op.as_str())
+                || is_prefix(last_op.as_str())
+            {
                 num.push(c);
                 continue;
             }
@@ -64,6 +70,7 @@ fn rpn_from_infix(exp: String) -> Vec<String> {
             if is_postfix(c.to_string().as_str()) {
                 out.push(c.to_string());
             } else if is_prefix(op.as_str()) {
+                last_op = op.clone();
                 stack.push(op.clone());
                 op.clear();
             } else if c == '(' {
@@ -136,6 +143,16 @@ fn rpn_evaluate(exp: Vec<String>) -> Result<f64, String> {
                 "sqrt" => stack.push(l.sqrt()),
                 "sin" => stack.push(l.to_radians().sin()),
                 "cos" => stack.push(l.to_radians().cos()),
+                "tan" => stack.push(l.to_radians().tan()),
+                "cot" => stack.push(l.to_radians().cos() / l.to_radians().sin()),
+                "sec" => stack.push(1.0 / l.to_radians().cos()),
+                "csc" => stack.push(1.0 / l.to_radians().sin()),
+                "arcsin" => stack.push(l.asin().to_degrees()),
+                "arccos" => stack.push(l.acos().to_degrees()),
+                "arctan" => stack.push(l.atan()),
+                "arccot" => stack.push((l / (1.0 + l.powf(2.0)).sqrt()).acos()),
+                "arcsec" => stack.push((1.0 / l).acos().to_degrees()),
+                "arccsc" => stack.push((1.0 / l).asin().to_degrees()),
                 "!" => stack.push(factorial(l.round() as usize).ok_or("factorial error")? as f64),
                 _ => return Err(format!("Unknown operator {}", tok)),
             }
