@@ -13,25 +13,30 @@ fn get_precedence(op: &str) -> isize {
 }
 
 fn is_binary(op: &str) -> bool {
-    match op {
-        "+" | "-" | "*" | "/" | "^" => true,
-        _ => false,
-    }
+    matches!(op, "+" | "-" | "*" | "/" | "^")
 }
 
 fn is_postfix(op: &str) -> bool {
-    match op {
-        "!" => true,
-        _ => false,
-    }
+    matches!(op, "!")
 }
 
 fn is_prefix(op: &str) -> bool {
-    match op {
-        "sqrt" | "sin" | "cos" | "tan" | "cot" | "sec" | "csc" | "arcsin" | "arccos" | "arctan"
-        | "arccot" | "arcsec" | "arccsc" => true,
-        _ => false,
-    }
+    matches!(
+        op,
+        "sqrt"
+            | "sin"
+            | "cos"
+            | "tan"
+            | "cot"
+            | "sec"
+            | "csc"
+            | "arcsin"
+            | "arccos"
+            | "arctan"
+            | "arccot"
+            | "arcsec"
+            | "arccsc"
+    )
 }
 
 fn rpn_from_infix(exp: String) -> Vec<String> {
@@ -45,18 +50,18 @@ fn rpn_from_infix(exp: String) -> Vec<String> {
         if c.is_whitespace() {
             continue;
         }
-        if c == '-' {
-            if last_op == "Null"
+        if c == '-'
+            && (last_op == "Null"
                 || last_op == "("
                 || is_binary(last_op.as_str())
-                || is_prefix(last_op.as_str())
-            {
-                num.push(c);
-                continue;
-            }
+                || is_prefix(last_op.as_str()))
+        {
+            num.push(c);
+            continue;
         }
+
         last_op = c.to_string();
-        if c.is_digit(10) || c == '.' {
+        if c.is_ascii_digit() || c == '.' {
             num.push(c);
             continue;
         } else {
