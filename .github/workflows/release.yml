@@ -16,19 +16,14 @@ jobs:
       matrix:
         include:
           - target: x86_64-pc-windows-gnu
-            path: target/x86_64-pc-windows-gnu/release/calculator.exe
             name: windows-x86_64.zip
           - target: i686-pc-windows-gnu
-            path: target/i686-pc-windows-gnu/release/calculator.exe
             name: windows-i686.zip
           - target: x86_64-unknown-linux-gnu
-            path: target/x86_64-unknown-linux-gnu/release/calculator
             name: linux-x86_64.tar.gz
           - target: i686-unknown-linux-gnu
-            path: target/i686-unknown-linux-gnu/release/calculator
             name: linux-i686.tar.gz
           - target: aarch64-unknown-linux-gnu
-            path: target/aarch64-unknown-linux-gnu/release/calculator
             name: linux-aarch64.tar.gz
     steps:
       - uses: actions/checkout@v4
@@ -48,13 +43,15 @@ jobs:
         if: ${{ matrix.target == 'aarch64-unknown-linux-gnu' }}
         run: sudo apt update && sudo apt install gcc-aarch64-linux-gnu
       - name: Build
-        run: cargo build --release --target ${{ matrix.target }}
+        run: cargo build --release --locked --target ${{ matrix.target }}
+      - name: Get binaries path
+        run: export BINARIES=$(cargo build -q --message-format=json-render-diagnostics --release --locked --target ${{ matrix.target }} | jq -r 'select(.reason == "compiler-artifact") | select(.executable != null) | .executable')
       - name: Create archive for Linux
         if: ${{ contains(matrix.target, 'linux') }}
-        run: tar -czf ${{ matrix.name }} -C $(dirname ${{ matrix.path }}) $(basename ${{ matrix.path }})
+        run: bins=($BINARIES); tar -czf ${{ matrix.name }} -C $(dirname ${bins[0]}) $(for bin in ${bins[@]}; do basename $bin; done)
       - name: Create archive for Windows
         if: ${{ contains(matrix.target, 'windows')}}
-        run: zip -j ${{ matrix.name }} ${{ matrix.path }}
+        run: bins=($BINARIES); zip -j ${{ matrix.name }} $(for bin in ${bins[@]}; do echo -n "$bin "; done)
       - name: Upload binary
         uses: svenstaro/upload-release-action@v2
         with:
