@@ -249,12 +249,32 @@ mod tests {
     }
 
     #[test]
-    fn sin_cos() {
+    fn trigonometry() {
         let r_1 = rpn_from_infix(String::from("sin 90"));
         let r_2 = rpn_from_infix(String::from("cos 180"));
+        let r_3 = rpn_from_infix(String::from("tan 45"));
+        let r_4 = rpn_from_infix(String::from("cot 45"));
+        let r_5 = rpn_from_infix(String::from("sec 60"));
+        let r_6 = rpn_from_infix(String::from("csc 30"));
+        let r_7 = rpn_from_infix(String::from("arcsin 0.5"));
+        let r_8 = rpn_from_infix(String::from("arccos 0.5"));
+        let r_9 = rpn_from_infix(String::from("arctan 1"));
+        let r_10 = rpn_from_infix(String::from("arccot 1"));
+        let r_11 = rpn_from_infix(String::from("arcsec 2"));
+        let r_12 = rpn_from_infix(String::from("arccsc 2"));
 
         assert_eq!(rpn_evaluate(r_1).unwrap(), 1.0, "sin failed");
         assert_eq!(rpn_evaluate(r_2).unwrap(), -1.0, "cos failed");
+        assert_eq!(rpn_evaluate(r_3).unwrap(), 1.0, "tan failed");
+        assert_eq!(rpn_evaluate(r_4).unwrap(), 1.0, "cot failed");
+        assert_eq!(rpn_evaluate(r_5).unwrap(), 2.0, "sec failed");
+        assert_eq!(rpn_evaluate(r_6).unwrap(), 2.0, "csc failed");
+        assert_eq!(rpn_evaluate(r_7).unwrap(), 30.0, "arcsin failed");
+        assert_eq!(rpn_evaluate(r_8).unwrap(), 60.0, "arccos failed");
+        assert_eq!(rpn_evaluate(r_9).unwrap(), 45.0, "arctan failed");
+        assert_eq!(rpn_evaluate(r_10).unwrap(), 45.0, "arccot failed");
+        assert_eq!(rpn_evaluate(r_11).unwrap(), 60.0, "arcsec failed");
+        assert_eq!(rpn_evaluate(r_12).unwrap(), 30.0, "arccsc failed");
     }
 
     #[test]
